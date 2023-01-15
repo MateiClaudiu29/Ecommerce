@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
+#nullable enable
 
 namespace Ecommerce.Data.Migrations
 {
@@ -17,7 +17,8 @@ namespace Ecommerce.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsAvailabe = table.Column<bool>(type: "bit", nullable: false),
+                    Allergens = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     ProductTypeId = table.Column<int>(type: "int", nullable: false),
                     SpecialTagId = table.Column<int>(type: "int", nullable: false)
                 },

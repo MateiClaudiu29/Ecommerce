@@ -40,9 +40,11 @@
                 <th>
                     @Html.DisplayNameFor(c => c.Price)
                 </th>
-       
                 <th>
-                    @Html.DisplayNameFor(c => c.IsAvailabe)
+                    @Html.DisplayNameFor(c => c.Allergens)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(c => c.IsAvailable)
                 </th>
                 <th>
                     @Html.DisplayNameFor(c => c.ProductTypeId)
@@ -50,7 +52,6 @@
                 <th>
                     @Html.DisplayNameFor(c => c.SpecialTagId)
                 </th>
-                <th></th>
                 <th></th>
             </tr>
         </thead>
@@ -61,15 +62,15 @@
                 <tr>
                     <td>@item.Name</td>
                     <td>@item.Price</td>
-                    
-                    <td>@item.IsAvailabe</td>
+                    <td>@item.Allergens</td>
+                    <td>@item.IsAvailable</td>
                     <td>@item.ProductTypes.ProductType</td>
-                    <td>@item.SpecialTags.SpecialTag</td>
+                    <td>@item.SpecialTag.SpecialTag</td>
                     <td style="width: 150px">
                         <div class="btn-group">
-                            <a asp-action="Edit" asp-controller="Products" class="btn btn-primary" asp-route-id="@item.Id">Edit</a>
-                            <a asp-action="Details" asp-controller="Products" class="btn btn-success" asp-route-id="@item.Id">Details</a>
-                            <a asp-action="Delete" asp-controller="Products" class="btn btn-danger" asp-route-id="@item.Id">Delete</a>
+                            <a asp-action="Edit" asp-controller="Product" class="btn btn-primary" asp-route-id="@item.Id">Edit</a>
+                            <a asp-action="Details" asp-controller="Product" class="btn btn-success" asp-route-id="@item.Id">Details</a>
+                            <a asp-action="Delete" asp-controller="Product" class="btn btn-danger" asp-route-id="@item.Id">Delete</a>
                         </div>
                     </td>
                 </tr>
@@ -84,25 +85,22 @@
     <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.11.2/build/alertify.min.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function () {
+        $(document).ready( function () {
             $('#myTable').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
-                    'pageLength', 'copy', 'csv', 'excel', 'pdf', 'print'
+                    'pageLength','copy', 'csv', 'excelHthml5', 'pdfHtml5', 'print'
                 ]
             });
-        });
-        $(function () {
+        } );
+        $(function(){
             var save = '@TempData["save"]'
-            if (save != '') {
+            var del = '@TempData["del"]'
+            if(save!='') {
                 alertify.success(save);
             }
-            var edit = '@TempData["edit"]'
-            if (edit != '') {
-                alertify.success(edit);
-            }
-            var del = '@TempData["delete"]'
-            if (del != '') {
+            
+            if (del!='') {
                 alertify.error(del);
             }
         })

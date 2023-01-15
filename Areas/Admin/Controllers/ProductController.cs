@@ -1,40 +1,45 @@
-﻿using Ecommerce.Data;
-using Ecommerce.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Ecommerce.Data;
+using Ecommerce.Models;
+
+
 
 namespace Ecommerce.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class ProductsController : Controller
+    public class ProductController : Controller
     {
-
-
         private ApplicationDbContext _db;
-        private IHostingEnvironment _he;
+        private Microsoft.AspNetCore.Hosting.IHostingEnvironment _he;
 
-        public ProductsController(ApplicationDbContext db, IHostingEnvironment he)
+        public ProductController(ApplicationDbContext db, Microsoft.AspNetCore.Hosting.IHostingEnvironment he)
         {
             _db = db;
             _he = he;
         }
         public IActionResult Index()
         {
-            return View(_db.Products.Include(c => c.ProductTypes).Include(f => f.SpecialTags).ToList());
+            return View(_db.Products.Include(c => c.ProductTypes).Include(f => f.SpecialTag).ToList());
         }
 
         //POST Index action method
         [HttpPost]
         public IActionResult Index(decimal? lowAmount, decimal? largeAmount)
         {
-            var products = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTags)
+            var products = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTag)
                 .Where(c => c.Price >= lowAmount && c.Price <= largeAmount).ToList();
             if (lowAmount == null || largeAmount == null)
             {
-                products = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTags).ToList();
+                products = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTag).ToList();
             }
             return View(products);
         }
@@ -59,7 +64,7 @@ namespace Ecommerce.Areas.Admin.Controllers
                 {
                     ViewBag.message = "This product is already exist";
                     ViewData["productTypeId"] = new SelectList(_db.ProductTypes.ToList(), "Id", "ProductType");
-                    ViewData["TagId"] = new SelectList(_db.SpecialTags.ToList(), "Id", "Name");
+                    ViewData["TagId"] = new SelectList(_db.SpecialTags.ToList(), "Id", "SpecialTag");
                     return View(product);
                 }
 
@@ -72,10 +77,11 @@ namespace Ecommerce.Areas.Admin.Controllers
 
                 if (image == null)
                 {
-                    product.Image = "Images/noimage.jpg";
+                    product.Image = "Image/noimage.jpg";
                 }
                 _db.Products.Add(product);
                 await _db.SaveChangesAsync();
+                TempData["save"] = "Product saved successfully";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -84,7 +90,7 @@ namespace Ecommerce.Areas.Admin.Controllers
 
         //GET Edit Action Method
 
-        public ActionResult Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             ViewData["productTypeId"] = new SelectList(_db.ProductTypes.ToList(), "Id", "ProductType");
             ViewData["TagId"] = new SelectList(_db.SpecialTags.ToList(), "Id", "SpecialTag");
@@ -93,8 +99,7 @@ namespace Ecommerce.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTags)
-                .FirstOrDefault(c => c.Id == id);
+            var product = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTag).FirstOrDefault(c => c.Id == id);
             if (product == null)
             {
                 return NotFound();
@@ -106,8 +111,7 @@ namespace Ecommerce.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Products products, IFormFile image)
         {
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 if (image != null)
                 {
@@ -118,18 +122,18 @@ namespace Ecommerce.Areas.Admin.Controllers
 
                 if (image == null)
                 {
-                    products.Image = "Images/noimage.jpg";
+                    products.Image = "Image/noimage.PNG";
                 }
                 _db.Products.Update(products);
                 await _db.SaveChangesAsync();
+                TempData["save"] = "Product updated successfully";
                 return RedirectToAction(nameof(Index));
             }
 
             return View(products);
         }
 
-        //GET Details Action Method
-        public ActionResult Details(int? id)
+        public IActionResult Details(int? id)
         {
 
             if (id == null)
@@ -137,8 +141,7 @@ namespace Ecommerce.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = _db.Products.Include(c => c.ProductTypes).Include(c => c.SpecialTags)
-                .FirstOrDefault(c => c.Id == id);
+            var product = _db.Products.Include(c => c.SpecialTag).Include(c => c.ProductTypes).Where(c => c.Id == id).FirstOrDefault();
             if (product == null)
             {
                 return NotFound();
@@ -148,14 +151,15 @@ namespace Ecommerce.Areas.Admin.Controllers
 
         //GET Delete Action Method
 
-        public ActionResult Delete(int? id)
+        public IActionResult Delete(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = _db.Products.Include(c => c.SpecialTags).Include(c => c.ProductTypes).Where(c => c.Id == id).FirstOrDefault();
+            var product = _db.Products.Include(c => c.SpecialTag).Include(c => c.ProductTypes).Where(c => c.Id == id).FirstOrDefault();
             if (product == null)
             {
                 return NotFound();
@@ -182,8 +186,12 @@ namespace Ecommerce.Areas.Admin.Controllers
 
             _db.Products.Remove(product);
             await _db.SaveChangesAsync();
+            TempData["del"] = "Product deleted";
             return RedirectToAction(nameof(Index));
         }
+
+
+
 
     }
 }
