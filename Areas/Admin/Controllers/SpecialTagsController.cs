@@ -1,10 +1,13 @@
 ﻿using Ecommerce.Data;
 using Ecommerce.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace Ecommerce.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class SpecialTagsController : Controller
     {
         private ApplicationDbContext _db;
@@ -13,7 +16,7 @@ namespace Ecommerce.Areas.Admin.Controllers
         {
             _db = db;
         }
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View(_db.SpecialTags.ToList());

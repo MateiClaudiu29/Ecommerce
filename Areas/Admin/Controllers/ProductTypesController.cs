@@ -1,10 +1,16 @@
-﻿using Ecommerce.Data;
-using Ecommerce.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ecommerce.Data;
+using Ecommerce.Models;
 
 namespace Ecommerce.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProductTypesController : Controller
     {
         private ApplicationDbContext _db;
@@ -13,7 +19,7 @@ namespace Ecommerce.Areas.Admin.Controllers
         {
             _db = db;
         }
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View(_db.ProductTypes.ToList());

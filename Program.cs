@@ -20,10 +20,10 @@ builder.Services.AddSession(options =>
 });
 
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<IdentityUser,IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddMvc();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -46,6 +46,8 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//app.UseMvc();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
@@ -58,5 +60,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
 
 app.Run();

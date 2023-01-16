@@ -10,12 +10,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.Data;
 using Ecommerce.Models;
-
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles ="Admin")]
     public class ProductController : Controller
     {
         private ApplicationDbContext _db;
@@ -26,6 +26,7 @@ namespace Ecommerce.Areas.Admin.Controllers
             _db = db;
             _he = he;
         }
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View(_db.Products.Include(c => c.ProductTypes).Include(f => f.SpecialTag).ToList());
